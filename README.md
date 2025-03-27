@@ -43,6 +43,9 @@ This is a reference application showcasing the integration of [CometChat's React
   </tr>
 </table>
 
+## 🚀 Try the New v5 UI Kit!
+Discover the all-new [v5 UI Kit](https://github.com/cometchat/cometchat-uikit-react-native/tree/v5), featuring a completely revamped design for enhanced usability and visual appeal. With restructured components, advanced styling options, and a streamlined integration process, v5 offers a seamless, customizable experience tailored to your needs. Try it now and elevate your development workflow!
+
 
 ## Prerequisites
 
