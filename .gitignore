@@ -43,6 +43,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 yarn.lock # include if you are using yarn - don't use both npm and yarn
+package-lock.json # include if you prefer to use yarn instead of npm
 
 # BUCK
 buck-out/
@@ -94,3 +95,23 @@ Pods
 .idea
 .gradle
 vendor
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# TypeScript
+*.tsbuildinfo
+
+# Metro bundler cache
+.metro-cache/
+
+# VSCode
+.vscode/
+
+# Windows
+Thumbs.db
+
+# Testing
+coverage/

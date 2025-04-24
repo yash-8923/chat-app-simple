@@ -5,8 +5,20 @@ import { AppStyle } from "../../AppStyle";
 import { CardView } from "../../components/common/CardView"
 import { Logout } from '../../resources';
 import { UserContext } from "../../../UserContext";
+import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
-const UiKitModules = [
+type ModuleItem = {
+    name: string;
+    id?: string;
+    info: string;
+};
+
+const UiKitModules: ModuleItem[] = [
+    {
+        name: "SimpleChat",
+        id: "SimpleChat",
+        info: "A simplified chat module with real-time messaging capabilities. Select users to chat with and exchange messages in real-time.",
+    },
     {
         name: "Conversations",
         info: "Conversations module helps you to list the recent conversations between your users and groups. To learn more about components click here.",
@@ -37,11 +49,15 @@ const UiKitModules = [
     },
 ];
 
-export const Home = ({ navigation }) => {
+interface HomeProps {
+    navigation: NavigationProp<ParamListBase>;
+}
+
+export const Home = ({ navigation }: HomeProps) => {
 
     const { setGroup, setUser, setCall } = useContext(UserContext);
 
-    const Navigate = (to) => {
+    const Navigate = (to: string) => {
         navigation.navigate(`${to}Module`);
     }
 
@@ -64,18 +80,20 @@ export const Home = ({ navigation }) => {
 
         userRequest.fetchNext()
             .then(res => {
-                console.log("setting user", res[0]['uid']);
-                if (res.length > 0)
+                if (res.length > 0) {
+                    console.log("setting user", res[0].getUid());
                     setUser?.(res[0]);
+                }
             })
             .catch(rej => {
                 console.log("no user found");
             })
         groupRequest.fetchNext()
             .then(res => {
-                console.log("setting group", res[0]['guid']);
-                if (res.length > 0)
+                if (res.length > 0) {
+                    console.log("setting group", res[0].getGuid());
                     setGroup?.(res[0]);
+                }
             })
             .catch(rej => {
                 console.log("no group found");

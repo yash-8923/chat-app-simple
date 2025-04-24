@@ -1,86 +1,207 @@
-import React, { useContext } from "react";
-import { View, Text, TextInput, StyleSheet, Alert, Modal, Image, ActivityIndicator, StatusBar } from "react-native";
-import { RoudedButton } from "../../components/common/RoundedButton";
-import { Create } from "./Create";
+import React, { useContext, useState } from "react";
+import {
+    View, Text, Image, TextInput, StyleSheet,
+    TouchableOpacity, ActivityIndicator, Modal, KeyboardAvoidingView, Platform, ScrollView, Alert
+} from 'react-native';
+import { AppStyle } from "../../AppStyle";
 import { CometChatContext, CometChatUIKit } from "@cometchat/chat-uikit-react-native";
 
-export const SignIn = (props) => {
-    const [uid, setUID] = React.useState("");
-    const [isLoginInProgress, setLoginInProgress] = React.useState(false);
-    
-    const {theme} = useContext(CometChatContext);
+export const SignIn = ({ navigation }) => {
+    const [userId, setUserId] = useState('');
+    const [isLoginInProgress, setLoginInProgress] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const { theme } = useContext(CometChatContext);
+
+    const handleLogin = () => {
+        if (!userId.trim()) {
+            setErrorMessage('User ID cannot be empty');
+            return;
+        }
+
+        setErrorMessage('');
+        setLoginInProgress(true);
+        
+        CometChatUIKit.login({ uid: userId.trim() })
+            .then(user => {
+                setLoginInProgress(false);
+                navigation.navigate("ChatUserList");
+            })
+            .catch(error => {
+                setLoginInProgress(false);
+                console.log("Login error:", error);
+                
+                let message = "Login failed. Please try again.";
+                if (error.code === "ERR_UID_NOT_FOUND") {
+                    message = "User not found. Please check the User ID or create a new account.";
+                } else if (error.code === "ERR_CONNECTION_FAILURE") {
+                    message = "Connection failed. Please check your internet connection.";
+                }
+                
+                setErrorMessage(message);
+            });
+    };
 
     return (
-        <View style={{flex: 1, padding: 8}}>
-            {
-                isLoginInProgress ? 
-                    <Modal transparent statusBarTranslucent>
-                        <View style={{backgroundColor: "rgba(20,20,20,0.5)", flex: 1, justifyContent: "center"}}>
-                        <View style={{alignSelf:"center", alignItems: "center", justifyContent: "center", backgroundColor: "#fff", width: "80%", padding: 16, borderRadius: 16}}>
-                            <Image style={{height: 200, width: 200, marginBottom: 8, alignSelf: "center"}} source={require("./logo.png")} />
-                            <ActivityIndicator size="large" color={theme.palette.getPrimary()} />
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+            <ScrollView style={styles.container}>
+                {isLoginInProgress && (
+                    <Modal transparent>
+                        <View style={styles.modalBackground}>
+                            <View style={styles.modalContent}>
+                                <Image 
+                                    style={styles.logo} 
+                                    source={require("./logo.png")} 
+                                />
+                                <ActivityIndicator size="large" color={theme.palette.getPrimary()} />
+                            </View>
                         </View>
-                        </View>
-                    </Modal> :
-                    null
-            }
-            <Text style={Style.header}>Sign In</Text>
-            <Text style={Style.welcome}>Welcome!</Text>
-            <Text style={Style.defaultText}>Kindly, enter UID to proceed</Text>
-            <TextInput
-                value={uid}
-                onChangeText={txt => setUID(txt)}
-                style={Style.inputBox}
-                placeholder="Enter UID"
-            />
-            <View style={{flex: 1}} />
+                    </Modal>
+                )}
+                
+                <View style={styles.content}>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => navigation.goBack()}>
+                        <Text style={styles.backButtonText}>← Back</Text>
+                    </TouchableOpacity>
 
-            <View>
-                <RoudedButton
-                    style={Style.signInButton}
-                    onPress={() => {
-                        setLoginInProgress(true);
-                        CometChatUIKit.login({uid})
-                            .then(user => {
-                                props.navigation.navigate("Home");
-                                setLoginInProgress(false);
-                            })
-                            .catch(err => {
-                                Alert.alert("Error", "Unable to login")
-                                setLoginInProgress(false);
-                            })
-                     }}>
-                    <Text style={Style.signInText}>Sign In</Text>
-                </RoudedButton>
-                <Create navigator={props.navigation} />
-            </View>
-        </View>
-    )
+                    <View style={styles.formContainer}>
+                        <Text style={styles.heading}>Login</Text>
+                        <Text style={styles.subheading}>Enter your User ID</Text>
+
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={setUserId}
+                            placeholder="Enter your User ID"
+                            placeholderTextColor="#999"
+                            value={userId}
+                            autoCapitalize="none"
+                        />
+
+                        {errorMessage ? (
+                            <Text style={styles.errorText}>{errorMessage}</Text>
+                        ) : null}
+
+                        <TouchableOpacity
+                            style={[
+                                styles.loginButton, 
+                                { backgroundColor: theme.palette.getPrimary() },
+                                !userId.trim() && styles.disabledButton
+                            ]}
+                            disabled={!userId.trim() || isLoginInProgress}
+                            onPress={handleLogin}>
+                            <Text style={styles.loginButtonText}>
+                                Login
+                            </Text>
+                        </TouchableOpacity>
+                        
+                        <Text style={styles.helpText}>
+                            Enter your User ID to log in. If you don't have one, go back and create a new account.
+                        </Text>
+                    </View>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
+    );
 }
 
-const Style = StyleSheet.create({
-    header: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "black"
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "#f5f5f5"
     },
-    welcome: {
-        fontSize: 26,
-        color: "blue",
+    modalBackground: {
+        backgroundColor: "rgba(20,20,20,0.5)",
+        flex: 1,
+        justifyContent: "center"
+    },
+    modalContent: {
+        alignSelf: "center",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#fff",
+        width: "80%",
+        padding: 16,
+        borderRadius: 16
+    },
+    logo: {
+        height: 200,
+        width: 200,
+        marginBottom: 8,
+        alignSelf: "center"
+    },
+    content: {
+        backgroundColor: "#ffffff",
+        margin: 16,
+        flex: 1,
+        borderRadius: 12,
+        padding: 16,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3
+    },
+    backButton: {
+        marginTop: 8,
+        marginBottom: 16
+    },
+    backButtonText: {
+        color: "#4D8DFF",
+        fontSize: 16,
         fontWeight: "bold"
     },
-    defaultText: {
-        fontSize: 18,
-        fontWeight: "700"
+    formContainer: {
+        flex: 1,
+        marginTop: 8,
+        marginBottom: 16
     },
-    inputBox: {
-        width: "100%",
-        padding: 16,
-        backgroundColor: "rgba(20,20,20,0.1)",
-        borderRadius: 10
+    heading: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#333",
+        marginBottom: 8
     },
-    signInButton: {
-        backgroundColor: 'rgb(50,150,255)',padding: 8,margin: 8
+    subheading: {
+        fontSize: 16,
+        color: "#666",
+        marginBottom: 24
     },
-    signInText: {margin: 8, color: "white", fontWeight: "bold", fontSize: 18}
+    input: {
+        height: 50,
+        borderWidth: 1,
+        padding: 12,
+        borderRadius: 8,
+        borderColor: "#ddd",
+        backgroundColor: "#fff",
+        color: "#333",
+        fontSize: 16,
+        marginBottom: 16
+    },
+    errorText: {
+        color: "#f44336",
+        marginBottom: 16
+    },
+    loginButton: {
+        height: 50,
+        padding: 12,
+        borderRadius: 8,
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 16
+    },
+    disabledButton: {
+        opacity: 0.6
+    },
+    loginButtonText: {
+        fontWeight: "bold",
+        color: "white",
+        fontSize: 16
+    },
+    helpText: {
+        color: "#888",
+        textAlign: "center",
+        marginTop: 16,
+        fontSize: 14
+    }
 });
