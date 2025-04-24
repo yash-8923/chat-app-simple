@@ -14,7 +14,7 @@ const UserModules = [
     {
         id: "Users",
         name: "Users",
-        info: "CometChatUsers is an independent component used to set up a screen that displays a scrollable list of users available in your app and gives you the ability to search for a specific user.",
+        info: "ChatifyUsers is an independent component used to set up a screen that displays a scrollable list of users available in your app and gives you the ability to search for a specific user.",
         image: Component2
     },
     {
