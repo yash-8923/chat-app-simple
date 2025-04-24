@@ -4,7 +4,7 @@
 
 # React Native Sample App by Chatify
 
-This is a reference application showcasing the integration of [Chatify's React Native UI Kit](https://www.cometchat.com/docs/v4/react-native-uikit/overview) in React Native. It offers developers practical examples for incorporating real-time messaging, as well as voice and video calling functionalities, into their React Native-based applications.
+This is a mobile app in React Native. It shows practical examples for implementing real-time messaging in their React Native-based applications.
 <table>    
   <tr>
     <td valign="center" style="text-align: center">
@@ -58,7 +58,7 @@ Discover the all-new [v5 UI Kit](https://github.com/cometchat/cometchat-uikit-re
 1. Clone the repository:
    - Using HTTPS
      ```
-     git clone https://github.com/cometchat/cometchat-sample-app-react-native.git
+     git clone https://github.com/yash-8923/chat-app-simple.git
      ```
 2. Navigate to the cloned directory:
    ```
